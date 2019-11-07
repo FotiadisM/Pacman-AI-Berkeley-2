@@ -18,6 +18,9 @@ import random, util
 
 from game import Agent
 
+def manhattanDistance(position, target):
+    return abs(position[0] - target[0]) + abs(position[1] - target[1])
+
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -74,7 +77,16 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        if(action == 'Stop'):
+            return float('-inf')
+        elif(newPos in [ghost.getPosition() for ghost in newGhostStates] and newScaredTimes == [0]):
+            return float('-inf')
+        elif(newPos in currentGameState.getFood().asList()):
+            return float('inf')
+
+        score = 0
+
+        return -score
 
 def scoreEvaluationFunction(currentGameState):
     """
