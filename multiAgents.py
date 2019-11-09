@@ -84,9 +84,9 @@ class ReflexAgent(Agent):
         elif(newPos in currentGameState.getFood().asList()):
             return float('inf')
 
-        score = 0
+        score = -util.manhattanDistance(newPos, newFood.asList()[0])
 
-        return -score
+        return score
 
 def scoreEvaluationFunction(currentGameState):
     """
