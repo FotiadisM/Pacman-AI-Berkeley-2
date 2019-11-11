@@ -85,6 +85,7 @@ class ReflexAgent(Agent):
             return float('inf')
 
         score = -util.manhattanDistance(newPos, newFood.asList()[0])
+        # score = -min([util.manhattanDistance(newPos, food) for food in newFood.asList()])
 
         return score
 
@@ -141,7 +142,28 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def minimax(gameState, depth, agentIndex):
+            if depth == self.depth or gameState.isLose() or gameState.isWin():
+                return self.evaluationFunction(gameState)
+            if agentIndex == self.index:        # If agent == Pacman -> maximize
+                return max(minimax(gameState.generateSuccessor(self.index, action), depth, 1) for action in gameState.getLegalActions(self.index))
+            else:       # agent == Ghost -> minimise
+                tmpAgentIndex = agentIndex + 1
+                if(agentIndex == gameState.getNumAgents()-1):   # number of GHosts
+                    tmpAgentIndex = self.index
+                    depth += 1
+                return min(minimax(gameState.generateSuccessor(agentIndex, action), depth, tmpAgentIndex) for action in gameState.getLegalActions(agentIndex))
+
+        actions = gameState.getLegalActions(self.index)
+        scores = []
+        for action in actions:
+            scores.append(minimax(gameState.generateSuccessor(self.index, action), 0, 1))
+
+        bestScore = max(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices)
+
+        return actions[chosenIndex]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
