@@ -77,9 +77,9 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        if(action == 'Stop'):
-            return float('-inf')
-        elif(newPos in [ghost.getPosition() for ghost in newGhostStates] and newScaredTimes == [0]):
+        # if(action == 'Stop'):
+        #     return float('-inf')
+        if(newPos in [ghost.getPosition() for ghost in newGhostStates] and newScaredTimes == [0]):
             return float('-inf')
         elif(newPos in currentGameState.getFood().asList()):
             return float('inf')
@@ -267,8 +267,44 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    position = currentGameState.getPacmanPosition()
+    foodNodes = currentGameState.getFood().asList()
+    capsuleNodes = currentGameState.getCapsules()
+    ghostStates = currentGameState.getGhostStates()
+
+    if(position in [ghost.getPosition() for ghost in ghostStates]):
+        return float('-inf')
+
+    minFoodD = 0
+    minActiveGhostD = 1
+    minScaredGhostD = 0
+    activeGhosts = []
+    scaredGhosts = []
+
+    for ghost in ghostStates:
+        if ghost.scaredTimer == 0:
+            activeGhosts.append(ghost)
+        else:
+            scaredGhosts.append(ghost)
+
+    if len(foodNodes) != 0:
+        minFoodD = min([util.manhattanDistance(position, food) for food in foodNodes])
+
+    if len(activeGhosts) != 0:
+        minActiveGhostD = min([util.manhattanDistance(position, ghost.getPosition()) for ghost in activeGhosts])
+
+    if len(scaredGhosts) != 0:
+        minScaredGhostD = min([util.manhattanDistance(position, ghost.getPosition()) for ghost in scaredGhosts])
+
+
+    score =  1   * currentGameState.getScore() + \
+            -1.5 * minFoodD + \
+            -2   * (1. / minActiveGhostD) + \
+            -2   * minScaredGhostD + \
+            -80  * len(capsuleNodes) + \
+            -4   * len(foodNodes)
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
-
